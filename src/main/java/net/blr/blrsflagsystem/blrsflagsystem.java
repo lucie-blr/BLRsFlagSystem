@@ -2,9 +2,13 @@ package net.blr.blrsflagsystem;
 
 import com.mojang.logging.LogUtils;
 import net.blr.blrsflagsystem.command.FlagsCommand;
+import net.blr.blrsflagsystem.event.ModEvents;
+import net.blr.blrsflagsystem.flag.PlayerFlag;
+import net.blr.blrsflagsystem.flag.PlayerFlagProvider;
 import net.blr.blrsflagsystem.item.Items;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,6 +35,10 @@ public class blrsflagsystem
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(FlagsCommand.class);
+        MinecraftForge.EVENT_BUS.register(Items.class);
+        MinecraftForge.EVENT_BUS.register(ModEvents.class);
+        MinecraftForge.EVENT_BUS.register(PlayerFlag.class);
+        MinecraftForge.EVENT_BUS.register(PlayerFlagProvider.class);
 
         // Register the items
         Items.register(modEventBus);
@@ -43,4 +51,5 @@ public class blrsflagsystem
     public void onRegisterCommands(RegisterCommandsEvent event) {
         FlagsCommand.register(event.getDispatcher());
     }
+
 }

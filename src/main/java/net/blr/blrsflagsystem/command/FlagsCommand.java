@@ -1,56 +1,54 @@
 package net.blr.blrsflagsystem.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.LiteralMessage;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.client.gui.components.ChatComponent;
+import net.blr.blrsflagsystem.flag.FlagEnum.Flag;
+import net.blr.blrsflagsystem.flag.PlayerFlagProvider;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.server.command.EnumArgument;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static net.minecraft.commands.Commands.literal;
 
 public class FlagsCommand {
+
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 literal("flags")
-                        .then(Commands.argument("flag", StringArgumentType.string())
+                        .then(Commands.argument("flag", EnumArgument.enumArgument(Flag.class))
                         .executes(context -> {
                             final ServerPlayer player = context.getSource().getPlayerOrException();
 
-                            String flag = context.getArgument("flag", String.class);
+                            Flag flag = context.getArgument("flag", Flag.class);
 
                             CommandSourceStack source = context.getSource();
 
-                            //list of flags
-
-                            final Map<String, String> flags = new HashMap<>();
-
-                            flags.put("France", "ҁ");
-                            flags.put("USA", ":usa:");
-                            flags.put("UK", ":uk:");
-
-                            if (flag == null) {
-                                source.sendFailure(Component.literal("You must specify a flag to test."));
+                            if (flag.getName() == null) {
+                                source.sendFailure(Component.literal("You must specify a flag to set."));
                                 return 0;
                             }
 
-                            else if (flags.containsKey(flag)) {
-                                player.getPrefixes().add(Component.literal(flags.get(flag) + " "));
+                            else {
 
-                                source.sendSuccess(Component.literal("set your flag to " + flags.get(flag)), true);
+                                if (!player.getPrefixes().isEmpty()) {
+                                    player.getPrefixes().clear();
+                                }
+
+                                player.getPrefixes().add(Component.literal(flag.getCharEmoji() + " "));
+
+                                player.getCapability(PlayerFlagProvider.PLAYER_FLAG).ifPresent(flagStore -> {
+                                    flagStore.setFlagName(flag.getName());
+                                });
+
+                                source.sendSuccess(Component.literal("set your flag to " + flag.getCharEmoji()), true);
                                 return 1;
                             }
 
-
-                            source.sendSuccess(Component.literal("Flag " + flag + " does not exist."), true);
-
-                            return 1;
                         }))
         );
     }
