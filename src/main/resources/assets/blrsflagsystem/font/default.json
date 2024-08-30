@@ -1,0 +1,12 @@
+{
+  "providers":
+  [
+    {
+      "type": "bitmap",
+      "ascent": 8,
+      "chars": ["\u0481"],
+      "file": "flag/fr.png",
+      "height": 8
+    }
+  ]
+}
